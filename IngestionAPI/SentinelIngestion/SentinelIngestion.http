@@ -1,0 +1,6 @@
+@SentinelIngestion_HostAddress = http://localhost:5015
+
+GET {{SentinelIngestion_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

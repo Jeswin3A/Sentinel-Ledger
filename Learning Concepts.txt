@@ -1,0 +1,38 @@
+requests (The Redis Connector)
+What it does: It allows Python to make standard HTTP/HTTPS web calls.
+
+Why we need it here: Since we discovered that your Upstash Redis instance is configured to use its secure REST API, your Python worker will use requests to continuously "pop" (remove and read) transaction strings out of your Upstash cloud queue over HTTPS.
+
+google-genai (The AI Compliance Brain)
+What it does: This is the official Google SDK used to communicate programmatically with the Gemini API.
+
+Why we need it here: When a transaction looks suspicious or breaks a rule, we don't want a generic error message. We pass that transaction details to Gemini using this library. We instruct Gemini to act as an automated compliance auditor and return a clean, structured JSON output outlining the risk profile and mitigation steps (like flagging the account or pausing the transfer).
+
+The Core .NET Update: We will add a new endpoint to your ASP.NET Core API (GET /api/compliance/pending) so the Angular frontend can fetch transactions that need human review. We'll also add an account-lockout endpoint (POST /api/accounts/lock).
+
+The Python Engine Update: The moment Gemini returns SUSPEND_TRANSACTION, the Python worker will immediately make a background HTTP call to your .NET lockout endpoint, automating the mitigation before a human even blinks.
+
+
+
+
+
+
+
+
+
+Challenges faced;
+
+If transaction_queue exists in your Upstash Data Browser but is completely empty, it means the Python background worker is actually working too fast!
+
+The moment your .NET API writes a transaction to Upstash via rpush, your Python engine immediately hooks it via lpop, processes it, and deletes it from the queue to keep it clean.
+
+Since the dots are continuing to print and no transaction details are showing up, it means the Python engine is popping the data but failing silently or skipping during the JSON parsing block right after the pop.
+
+
+Let's look closely at how the data is wrapped. In your updated REST .NET API, we used this line to serialize the body text:
+
+C#
+request.Content = new StringContent(JsonSerializer.Serialize(bodyText));
+This double-serializes the JSON payload, making it look like an escaped string inside Upstash. When Python reads it, it has to peel back two layers of JSON parsing. If that parsing fails or encounters a mismatch, it skips straight to the next loop.
+
+Let's do a live manual override test right now using the Upstash Console to see exactly how your Python worker handles a raw, perfectly formatted transaction payload!

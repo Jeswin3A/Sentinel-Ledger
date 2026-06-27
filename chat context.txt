@@ -1,0 +1,79 @@
+# Context: Real-Time Fraud & Compliance Observability Engine
+
+## Objective
+Build a production-grade, event-driven Full-Stack + AI application that monitors financial transactions in real-time, surfaces anomalies on a live Angular dashboard, and uses an AI agent to generate automated compliance reports. The entire stack must be built using 100% free-tier services.
+
+## Architecture & Workflow
+1. **Transaction Ingestion (ASP.NET Core):** A high-throughput REST API receives incoming transactions and pushes them into an Upstash Redis Queue.
+2. **Event Processing & Evaluation (Python/FastAPI):** A lightweight background service processes events from Redis, runs deterministic fraud-rule checks, and saves the data to a Neon/Supabase PostgreSQL database.
+3. **AI Agent Enrichment (Gemini API):** For high-risk transactions, the Python backend invokes a structured Gemini prompt to analyze the transaction context against compliance standards and outputs a JSON mitigation strategy.
+4. **Real-Time Streaming (WebSockets):** The ASP.NET Core backend broadcasts transaction alerts and AI insights to the frontend.
+5. **Live Dashboard (Angular):** A highly responsive UI displaying real-time metric counters, transaction logs, and an interactive compliance review panel.
+
+## Core Feature Roadmap
+
+### Phase 1: Database & Event Broker Setup
+- Provision a free PostgreSQL instance on Neon or Supabase.
+- Spin up a free Redis instance on Upstash.
+- Define schemas for `Transactions` (Id, Amount, Timestamp, Status, RiskScore) and `ComplianceAudits` (Id, TransactionId, AIAnalysis, Status).
+
+### Phase 2: ASP.NET Core Ingestion & WebSocket Gateway
+- Build an endpoint `POST /api/transactions` that validates payloads and publishes them to Redis.
+- Implement a WebSocket or SignalR Hub to broadcast live transaction state updates to connected clients.
+
+### Phase 3: Python Risk Engine & AI Agent
+- Create a FastAPI worker that listens to the Redis queue.
+- Implement deterministic checks (e.g., rapid velocity limits, high-amount thresholds).
+- Connect the free-tier Gemini API using structured JSON output to draft standard compliance summaries when a risk threshold is breached.
+- Persist all results back into the PostgreSQL database.
+
+### Phase 4: Angular Real-Time Dashboard
+- Scaffold a new Angular application utilizing Tailwind CSS.
+- Connect to the ASP.NET Core WebSocket stream.
+- Build a dual-view interface:
+  1. A live-updating monitoring ledger.
+  2. A "Deep Dive" panel to read the AI-generated compliance reports and manually override or approve them.
+
+---
+
+## Instructions for the AI Assistant
+We are building this project incrementally. Please follow these rules:
+1. Prioritize clean, modern architecture patterns (e.g., Repository pattern in .NET, modular structure in Angular).
+2. Avoid any premium cloud services or paid APIs; restrict everything to free-tier usage.
+3. Provide code step-by-step, starting with the database setup and backend skeleton before moving to the frontend.
+
+Let's begin by setting up the database schema and the ASP.NET Core project setup. Give me the initial folder structure and the project configuration files.
+
+[ Financial Clients ] 
+        │  (HTTP POST /api/transactions)
+        ▼
+┌────────────────────────────────────────────────────────┐
+│ 1. INGESTION LAYER (ASP.NET Core Web API)              │
+│    - Fast validation & handoff                         │
+└───────────────────┬────────────────────────────────────┘
+                    │ (Publish Event)
+                    ▼
+┌────────────────────────────────────────────────────────┐
+│ 2. EVENT BROKER (Upstash Redis Queue - Free Tier)      │
+└───────────────────┬────────────────────────────────────┘
+                    │ (Asynchronous Consume)
+                    ▼
+┌────────────────────────────────────────────────────────┐
+│ 3. RISK ENGINE & AI AGENT (Python / FastAPI Worker)    │
+│    - Deterministic Fraud Checks                        │
+│    - LLM Compliance Report (Gemini API Free Tier)      │
+└───────────────────┬────────────────────────────────────┘
+                    │
+            ┌───────┴───────┐
+            │ (Save State)  │ (Push Risk Alerts)
+            ▼               ▼
+┌───────────────────────┐ ┌──────────────────────────────┐
+│ 4. PERSISTENCE LAYER  │ │ 5. STREAMING GATEWAY         │
+│    PostgreSQL         │ │    (ASP.NET Core SignalR)    │
+│    (Neon / Supabase)  │ └──────────────┬───────────────┘
+└───────────────────────┘                │ (WebSockets)
+                                         ▼
+                          ┌──────────────────────────────┐
+                          │ 6. OBSERVABILITY UI          │
+                          │    (Angular + Tailwind CSS)  │
+                          └──────────────────────────────┘

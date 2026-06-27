@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "ZpLRSzTESog=",
+  "success": true,
+  "projectFilePath": "E:\\Jeswin B Tech\\Projects\\sentinel-ledger\\IngestionAPI\\SentinelIngestion\\SentinelIngestion.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\gjdel\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.9\\microsoft.aspnetcore.openapi.10.0.9.nupkg.sha512",
+    "C:\\Users\\gjdel\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512",
+    "C:\\Users\\gjdel\\.nuget\\packages\\npgsql\\10.0.3\\npgsql.10.0.3.nupkg.sha512",
+    "C:\\Users\\gjdel\\.nuget\\packages\\respite\\3.0.7\\respite.3.0.7.nupkg.sha512",
+    "C:\\Users\\gjdel\\.nuget\\packages\\stackexchange.redis\\3.0.7\\stackexchange.redis.3.0.7.nupkg.sha512",
+    "C:\\Users\\gjdel\\.nuget\\packages\\system.io.hashing\\10.0.5\\system.io.hashing.10.0.5.nupkg.sha512"
+  ],
+  "logs": []
+}
